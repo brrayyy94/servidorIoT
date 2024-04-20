@@ -1,6 +1,20 @@
 var mqtt = require("mqtt");
 const mysql = require("mysql");
 
+const express = require("express"); //se indica que se requiere express
+const app = express(); // se inicia express y se instancia en una constante de  nombre app.
+const morgan = require("morgan"); //se indica que se requiere morgan
+// settings
+
+app.set("port", 3000); //se define el puerto en el cual va a funcionar el servidor;
+// Utilities
+app.use(morgan("dev")); //se indica que se va a usar morgan en modo dev
+
+app.use(express.json()); //se indica que se va a usar la funcionalidad para manejo de json de express
+
+//Routes
+app.use(require("./routes/datos.js"));
+
 //var client = mqtt.connect('mqtt://localhost)
 var client = mqtt.connect("mqtt://broker.mqtt-dashboard.com");
 
@@ -17,14 +31,14 @@ client.on("connect", function () {
   client.subscribe("brayan.maca@uao.edu.co/SensorIR", function (err) {
     if (err) {
       console.log("error en la subscripcion");
-    }else {
+    } else {
       console.log("Subscripcion exitosa");
     }
   });
   client.subscribe("brayan.maca@uao.edu.co/SensorUltrasonido", function (err) {
     if (err) {
       console.log("error en la subscripcion");
-    }else {
+    } else {
       console.log("Subscripcion exitosa");
     }
   });
@@ -115,16 +129,19 @@ client.on("message", function (topic, message) {
       }
     });
   }
-  var distance = json1.valueUltrasonido; 
-    
-  if (distance >= 30) { 
-      json2 = { "estadoVs": "vacio" }; 
-  } else { 
-      json2 = { "estadoVs": 0 }; 
-  } 
-  
-  client.publish("brayan.maca@uao.edu.co/topico2", JSON.stringify(json2));
-  console.log("Mensaje publicado en el topico 2", JSON.stringify(json2));
+  var distance = json1.valueUltrasonido;
+
+  if (distance >= 30) {
+    json2 = { estadoVs: "vacio" };
+  } else {
+    json2 = { estadoVs: 0 };
+  }
+  //client.publish("brayan.maca@uao.edu.co/topico2", JSON.stringify(json2));
 
   //client.end() //si se habilita esta opción el servicio termina
+});
+
+//Start server
+app.listen(app.get("port"), () => {
+  console.log(`Servidor funcionando port http://localhost:${app.get("port")}`);
 });

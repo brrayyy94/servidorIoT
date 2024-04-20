@@ -1,0 +1,39 @@
+CREATE DATABASE calidatos;
+
+SHOW DATABASES;
+
+USE calidatos
+
+CREATE TABLE datosnodo (
+id int AUTO_INCREMENT,
+idnodo INT,
+temperatura DOUBLE,
+humedad DOUBLE,
+fechahora DATETIME,
+PRIMARY KEY (id));
+
+SHOW TABLES;
+
+SELECT * FROM datosnodo;
+DELETE FROM datosnodo WHERE idnodo=2;
+
+CREATE TABLE datosUltrasonido (
+id int AUTO_INCREMENT,
+idnodo INT,
+distancia DOUBLE,
+fechahora DATETIME,
+PRIMARY KEY (id));
+
+CREATE TABLE datosPeso (
+id int AUTO_INCREMENT,
+idnodo INT,
+peso DOUBLE,
+fechahora DATETIME,
+PRIMARY KEY (id));
+
+CREATE TABLE datosInfrarrojo (
+id int AUTO_INCREMENT,
+idnodo INT,
+actividad int,
+fechahora DATETIME,
+PRIMARY KEY (id));
