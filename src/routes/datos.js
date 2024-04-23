@@ -57,7 +57,7 @@ router.get("/datosUltrasonido", (req, res) => {
     } else {
       console.log("Conexion correcta.");
       //ejecución de la consulta
-      tempConn.query("SELECT * FROM datosUltrasonido", function (error, result) {
+      tempConn.query("SELECT * FROM datosUltrasonido where id = 1", function (error, result) {
         var resultado = result; //se almacena el resultado de la consulta en la variable resultado
         if (error) {
           throw error;
