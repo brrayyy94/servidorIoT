@@ -20,7 +20,7 @@
                 <th>DISTANCIA</th>
                 <th>FECHA</th>
             </tr>
-            <?php $url_rest = "http://localhost:3000/datos";
+            <?php $url_rest = "http://localhost:3000/datosUltrasonido";
             $curl = curl_init($url_rest);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
             $respuesta = curl_exec($curl);
@@ -36,8 +36,8 @@
                 $id = $j->id;
                 $idnodo = $j->idnodo;
                 $distancia = $j->distancia;
-                $fecha = $j->fecha;
-                echo "<tr><td>$id</td><td>$idnodo</td><td>$distancia</td><td>$fecha</td></tr>";
+                $fecha = $j->fechahora;
+                echo "<tr><td>$id</td><td>$idnodo</td><td>$distancia</td><td>$fechahora</td></tr>";
             }
             ?>
         </table>
@@ -46,7 +46,7 @@
             // Justo aquí estamos pasando la variable ----^ 
             </script>
             <canvas id="grafica" width="50" height="10"></canvas>
-            <script src="script-distancia.js"></script> 
+            <script src="script-ultrasonido.js"></script> 
             <a href="pagina1.php">Volver</a><br> 
             <a href="logout.php">Cerrar sesión</a>
     </body>
