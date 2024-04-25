@@ -10,7 +10,101 @@ const connection = mysql.createPool({
   database: "calidatos",
   port: 3306,
 });
+// Ruta GET para obtener datos de `datosInfrarrojo` filtrados por `idnodo`
+router.get("/datosInfrarrojo/:idnodo", (req, res) => {
+  const { idnodo } = req.params; // Obtener el parámetro `idnodo` de la solicitud
 
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      // Consulta para obtener todos los datos del día actual filtrados por `idnodo`
+      const query = `
+        SELECT * FROM datosInfrarrojo
+        WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
+
+      tempConn.query(query, [idnodo], (error, result) => {
+        if (error) {
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release(); // Liberar la conexión
+
+          if (result.length > 0) {
+            res.json(result); // Devolver los registros filtrados como respuesta JSON
+          } else {
+            res.status(404).json({ mensaje: "No se encontraron registros para hoy con ese idnodo." });
+          }
+        }
+      });
+    }
+  });
+});
+
+// Ruta GET para obtener datos de `datosUltrasonido` filtrados por `idnodo`
+router.get("/datosUltrasonido/:idnodo", (req, res) => {
+  const { idnodo } = req.params; // Obtener el parámetro `idnodo`
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      // Consulta para obtener datos de `datosUltrasonido` filtrados por `idnodo`
+      const query = `
+        SELECT * FROM datosUltrasonido
+        WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
+
+      tempConn.query(query, [idnodo], (error, result) => {
+        if (error) {
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release(); // Liberar la conexión
+
+          if (result.length > 0) {
+            res.json(result); // Devolver los registros como respuesta JSON
+          } else {
+            res.status(404).json({ mensaje: "No se encontraron registros para hoy con ese idnodo." });
+          }
+        }
+      });
+    }
+  });
+});
+
+// Ruta GET para obtener datos de `datosPeso` filtrados por `idnodo`
+router.get("/datosPeso/:idnodo", (req, res) => {
+  const { idnodo } = req.params;
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      // Consulta para obtener datos de `datosPeso` filtrados por `idnodo`
+      const query = `
+        SELECT * FROM datosPeso
+        WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
+
+      tempConn.query(query, [idnodo], (error, result) => {
+        if (error) {
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release(); // Liberar la conexión
+
+          if (result.length > 0) {
+            res.json(result); // Devolver los registros como respuesta JSON
+          } else {
+            res.status(404).json({ mensaje: "No se encontraron registros para hoy con ese idnodo." });
+          }
+        }
+      });
+    }
+  });
+});
 //rutas para infrarrojo (get, post, delete, put)
 router.get("/datosInfrarrojo", (req, res) => {
   var json1 = {}; //variable para almacenar cada registro que se lea, en  formato json
@@ -26,7 +120,6 @@ router.get("/datosInfrarrojo", (req, res) => {
         var resultado = result; //se almacena el resultado de la consulta en la variable resultado
         if (error) {
           throw error;
-          res.send("error en la ejecución del query");
         } else {
           tempConn.release(); //se librea la conexión
           for (i = 0; i < resultado.length; i++) {
@@ -63,7 +156,6 @@ router.post("/datosInfrarrojo", (req, res) => {
           //se ejecuta lainserción
           if (error) {
             throw error;
-            console.log("error al ejecutar el query"); //esto no se esta ejecutando
           } else {
             tempConn.release();
           }
@@ -91,7 +183,6 @@ router.delete("/datosInfrarrojo", (req, res) => {
           //se ejecuta lainserción
           if (error) {
             throw error;
-            console.log("error al ejecutar el query"); //esto no se esta ejecutando
           } else {
             tempConn.release();
           }
@@ -119,7 +210,6 @@ router.put("/datosInfrarrojo", (req, res) => {
           //se ejecuta lainserción
           if (error) {
             throw error;
-            console.log("error al ejecutar el query"); //esto no se esta ejecutando
           } else {
             tempConn.release();
           }
@@ -146,7 +236,6 @@ router.get("/datosUltrasonido", (req, res) => {
         var resultado = result; //se almacena el resultado de la consulta en la variable resultado
         if (error) {
           throw error;
-          res.send("error en la ejecución del query");
         } else {
           tempConn.release(); //se librea la conexión
           for (i = 0; i < resultado.length; i++) {
