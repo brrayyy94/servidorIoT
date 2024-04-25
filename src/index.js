@@ -1,5 +1,6 @@
 var mqtt = require("mqtt");
 const mysql = require("mysql");
+const routes = require("./routes/routes.js");
 
 const express = require("express"); //se indica que se requiere express
 const app = express(); // se inicia express y se instancia en una constante de  nombre app.
@@ -13,7 +14,8 @@ app.use(morgan("dev")); //se indica que se va a usar morgan en modo dev
 app.use(express.json()); //se indica que se va a usar la funcionalidad para manejo de json de express
 
 //Routes
-app.use(require("./routes/datos.js"));
+//Inicializar las rutas del servidor y configurar las rutas en la app de express
+routes(app);
 
 //var client = mqtt.connect('mqtt://localhost)
 var client = mqtt.connect("mqtt://broker.mqtt-dashboard.com");

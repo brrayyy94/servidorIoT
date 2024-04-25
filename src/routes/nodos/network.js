@@ -1,6 +1,9 @@
 const { Router } = require("express");
+
 const router = Router();
+
 const mysql = require("mysql");
+
 // se crea la conexión a mysql
 const connection = mysql.createPool({
   connectionLimit: 500,
@@ -9,37 +12,6 @@ const connection = mysql.createPool({
   password: "", //el password de ingreso a mysql
   database: "calidatos",
   port: 3306,
-});
-// Ruta GET para obtener datos de `datosInfrarrojo` filtrados por `idnodo`
-router.get("/datosInfrarrojo/:idnodo", (req, res) => {
-  const { idnodo } = req.params; // Obtener el parámetro `idnodo` de la solicitud
-
-  connection.getConnection((error, tempConn) => {
-    if (error) {
-      res.status(500).send("Error al conectar a la base de datos.");
-    } else {
-      console.log("Conexión correcta.");
-
-      // Consulta para obtener todos los datos del día actual filtrados por `idnodo`
-      const query = `
-        SELECT * FROM datosInfrarrojo
-        WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
-
-      tempConn.query(query, [idnodo], (error, result) => {
-        if (error) {
-          res.status(500).send("Error en la ejecución del query.");
-        } else {
-          tempConn.release(); // Liberar la conexión
-
-          if (result.length > 0) {
-            res.json(result); // Devolver los registros filtrados como respuesta JSON
-          } else {
-            res.status(404).json({ mensaje: "No se encontraron registros para hoy con ese idnodo." });
-          }
-        }
-      });
-    }
-  });
 });
 
 // Ruta GET para obtener datos de `datosUltrasonido` filtrados por `idnodo`
@@ -54,8 +26,8 @@ router.get("/datosUltrasonido/:idnodo", (req, res) => {
 
       // Consulta para obtener datos de `datosUltrasonido` filtrados por `idnodo`
       const query = `
-        SELECT * FROM datosUltrasonido
-        WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
+          SELECT * FROM datosUltrasonido
+          WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
 
       tempConn.query(query, [idnodo], (error, result) => {
         if (error) {
@@ -66,7 +38,11 @@ router.get("/datosUltrasonido/:idnodo", (req, res) => {
           if (result.length > 0) {
             res.json(result); // Devolver los registros como respuesta JSON
           } else {
-            res.status(404).json({ mensaje: "No se encontraron registros para hoy con ese idnodo." });
+            res
+              .status(404)
+              .json({
+                mensaje: "No se encontraron registros para hoy con ese idnodo.",
+              });
           }
         }
       });
@@ -86,8 +62,8 @@ router.get("/datosPeso/:idnodo", (req, res) => {
 
       // Consulta para obtener datos de `datosPeso` filtrados por `idnodo`
       const query = `
-        SELECT * FROM datosPeso
-        WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
+          SELECT * FROM datosPeso
+          WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
 
       tempConn.query(query, [idnodo], (error, result) => {
         if (error) {
@@ -98,7 +74,11 @@ router.get("/datosPeso/:idnodo", (req, res) => {
           if (result.length > 0) {
             res.json(result); // Devolver los registros como respuesta JSON
           } else {
-            res.status(404).json({ mensaje: "No se encontraron registros para hoy con ese idnodo." });
+            res
+              .status(404)
+              .json({
+                mensaje: "No se encontraron registros para hoy con ese idnodo.",
+              });
           }
         }
       });
@@ -134,6 +114,42 @@ router.get("/datosInfrarrojo", (req, res) => {
             arreglo.push(json1); //se añade el json al arreglo
           }
           res.json(arreglo); //se retorna el arreglo
+        }
+      });
+    }
+  });
+});
+
+// Ruta GET para obtener datos de `datosInfrarrojo` filtrados por `idnodo`
+router.get("/datosInfrarrojo/:idnodo", (req, res) => {
+  const { idnodo } = req.params; // Obtener el parámetro `idnodo` de la solicitud
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      // Consulta para obtener todos los datos del día actual filtrados por `idnodo`
+      const query = `
+          SELECT * FROM datosInfrarrojo
+          WHERE DATE(fechahora) = CURDATE() AND idnodo = ?`;
+
+      tempConn.query(query, [idnodo], (error, result) => {
+        if (error) {
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release(); // Liberar la conexión
+
+          if (result.length > 0) {
+            res.json(result); // Devolver los registros filtrados como respuesta JSON
+          } else {
+            res
+              .status(404)
+              .json({
+                mensaje: "No se encontraron registros para hoy con ese idnodo.",
+              });
+          }
         }
       });
     }
@@ -232,29 +248,31 @@ router.get("/datosUltrasonido", (req, res) => {
     } else {
       console.log("Conexion correcta.");
       //ejecución de la consulta
-      tempConn.query("SELECT * FROM datosUltrasonido where id = 1", function (error, result) {
-        var resultado = result; //se almacena el resultado de la consulta en la variable resultado
-        if (error) {
-          throw error;
-        } else {
-          tempConn.release(); //se librea la conexión
-          for (i = 0; i < resultado.length; i++) {
-            //se lee el resultado y se arma el json
-            json1 = {
-              id: resultado[i].id,
-              idnodo: resultado[i].idnodo,
-              distancia: resultado[i].distancia,
-              fechahora: resultado[i].fechahora,
-            };
-            console.log(json1); //se muestra el json en la consola
-            arreglo.push(json1); //se añade el json al arreglo
+      tempConn.query(
+        "SELECT * FROM datosUltrasonido where id = 1",
+        function (error, result) {
+          var resultado = result; //se almacena el resultado de la consulta en la variable resultado
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release(); //se librea la conexión
+            for (i = 0; i < resultado.length; i++) {
+              //se lee el resultado y se arma el json
+              json1 = {
+                id: resultado[i].id,
+                idnodo: resultado[i].idnodo,
+                distancia: resultado[i].distancia,
+                fechahora: resultado[i].fechahora,
+              };
+              console.log(json1); //se muestra el json en la consola
+              arreglo.push(json1); //se añade el json al arreglo
+            }
+            res.json(arreglo); //se retorna el arreglo
           }
-          res.json(arreglo); //se retorna el arreglo
         }
-      });
+      );
     }
   });
 });
-
 
 module.exports = router;
