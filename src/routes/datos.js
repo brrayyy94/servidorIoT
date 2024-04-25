@@ -10,8 +10,8 @@ const connection = mysql.createPool({
   database: "calidatos",
   port: 3306,
 });
-//function get en la ruta /datos, que trae todos los datos almacenados en la tabla;
 
+//rutas para infrarrojo (get, post, delete, put)
 router.get("/datosInfrarrojo", (req, res) => {
   var json1 = {}; //variable para almacenar cada registro que se lea, en  formato json
   var arreglo = []; //variable para almacenar todos los datos, en formato arreglo de json
@@ -47,6 +47,91 @@ router.get("/datosInfrarrojo", (req, res) => {
   });
 });
 
+router.post("/datosInfrarrojo", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "INSERT INTO datosinfrarrojo VALUES(null, ?, ?, now())",
+        [json1.idnodo, json1.actividad],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+            console.log("error al ejecutar el query"); //esto no se esta ejecutando
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos almacenados`); //mensaje de respuesta al cliente
+});
+
+router.delete("/datosInfrarrojo", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "DELETE FROM datosinfrarrojo WHERE idnodo = ?",
+        [json1.idnodo],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+            console.log("error al ejecutar el query"); //esto no se esta ejecutando
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos eliminados`); //mensaje de respuesta al cliente
+});
+
+router.put("/datosInfrarrojo", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "UPDATE datosinfrarrojo SET actividad = ? WHERE idnodo = ?",
+        [json1.actividad, json1.idnodo],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+            console.log("error al ejecutar el query"); //esto no se esta ejecutando
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos actualizados`); //mensaje de respuesta al cliente
+});
+
+//rutas para ultrasonido (get, post, delete, put)
 router.get("/datosUltrasonido", (req, res) => {
   var json1 = {}; //variable para almacenar cada registro que se lea, en  formato json
   var arreglo = []; //variable para almacenar todos los datos, en formato arreglo de json
@@ -81,6 +166,6 @@ router.get("/datosUltrasonido", (req, res) => {
     }
   });
 });
-//función post en la ruta /datos que recibe datos
+
 
 module.exports = router;
