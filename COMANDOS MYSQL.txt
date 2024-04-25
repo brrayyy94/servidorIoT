@@ -4,6 +4,12 @@ SHOW DATABASES;
 
 USE calidatos
 
+CREATE TABLE usuarios (
+id INT AUTO_INCREMENT PRIMARY KEY,
+user VARCHAR(255) NOT NULL,
+password VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE datosnodo (
 id int AUTO_INCREMENT,
 idnodo INT,
@@ -18,22 +24,25 @@ SELECT * FROM datosnodo;
 DELETE FROM datosnodo WHERE idnodo=2;
 
 CREATE TABLE datosUltrasonido (
-id int AUTO_INCREMENT,
+id int AUTO_INCREMENT PRIMARY KEY,
+usuario_id INT,
 idnodo INT,
 distancia DOUBLE,
 fechahora DATETIME,
-PRIMARY KEY (id));
+FOREIGN KEY (usuario_id) REFERENCES usuarios(id));
 
 CREATE TABLE datosPeso (
-id int AUTO_INCREMENT,
+id int AUTO_INCREMENT PRIMARY KEY,
+usuario_id INT,
 idnodo INT,
 peso DOUBLE,
 fechahora DATETIME,
-PRIMARY KEY (id));
+FOREIGN KEY (usuario_id) REFERENCES usuarios(id));
 
 CREATE TABLE datosInfrarrojo (
-id int AUTO_INCREMENT,
+id int AUTO_INCREMENT PRIMARY KEY,
+usuario_id INT,
 idnodo INT,
 actividad int,
 fechahora DATETIME,
-PRIMARY KEY (id));
+FOREIGN KEY (usuario_id) REFERENCES usuarios(id));

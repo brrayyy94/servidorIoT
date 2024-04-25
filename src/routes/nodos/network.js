@@ -14,6 +14,45 @@ const connection = mysql.createPool({
   port: 3306,
 });
 
+
+//rutas para ultrasonido (get, post, delete, put)
+router.get("/datosUltrasonido", (req, res) => {
+  var json1 = {}; //variable para almacenar cada registro que se lea, en  formato json
+  var arreglo = []; //variable para almacenar todos los datos, en formato arreglo de json
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //si no se pudo conectar
+    } else {
+      console.log("Conexion correcta.");
+      //ejecución de la consulta
+      tempConn.query(
+        "SELECT * FROM datosUltrasonido where id = 1",
+        function (error, result) {
+          var resultado = result; //se almacena el resultado de la consulta en la variable resultado
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release(); //se librea la conexión
+            for (i = 0; i < resultado.length; i++) {
+              //se lee el resultado y se arma el json
+              json1 = {
+                id: resultado[i].id,
+                idnodo: resultado[i].idnodo,
+                distancia: resultado[i].distancia,
+                fechahora: resultado[i].fechahora,
+              };
+              console.log(json1); //se muestra el json en la consola
+              arreglo.push(json1); //se añade el json al arreglo
+            }
+            res.json(arreglo); //se retorna el arreglo
+          }
+        }
+      );
+    }
+  });
+});
+
 // Ruta GET para obtener datos de `datosUltrasonido` filtrados por `idnodo`
 router.get("/datosUltrasonido/:idnodo", (req, res) => {
   const { idnodo } = req.params; // Obtener el parámetro `idnodo`
@@ -38,16 +77,95 @@ router.get("/datosUltrasonido/:idnodo", (req, res) => {
           if (result.length > 0) {
             res.json(result); // Devolver los registros como respuesta JSON
           } else {
-            res
-              .status(404)
-              .json({
-                mensaje: "No se encontraron registros para hoy con ese idnodo.",
-              });
+            res.status(404).json({
+              mensaje: "No se encontraron registros para hoy con ese idnodo.",
+            });
           }
         }
       });
     }
   });
+});
+
+router.post("/datosUltrasonido", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "INSERT INTO datosultrasonido VALUES(null, ?, ?, ?, now())",
+        [json1.usuario_id, json1.idnodo, json1.distancia],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos almacenados`); //mensaje de respuesta al cliente
+});
+
+router.delete("/datosUltrasonido", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "DELETE FROM datosultrasonido WHERE idnodo = ?",
+        [json1.idnodo],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos eliminados`); //mensaje de respuesta al cliente
+});
+
+router.put("/datosUltrasonido", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "UPDATE datosultrasonido SET distancia = ? WHERE idnodo = ?",
+        [json1.distancia, json1.idnodo],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos actualizados`); //mensaje de respuesta al cliente
 });
 
 // Ruta GET para obtener datos de `datosPeso` filtrados por `idnodo`
@@ -74,51 +192,136 @@ router.get("/datosPeso/:idnodo", (req, res) => {
           if (result.length > 0) {
             res.json(result); // Devolver los registros como respuesta JSON
           } else {
-            res
-              .status(404)
-              .json({
-                mensaje: "No se encontraron registros para hoy con ese idnodo.",
-              });
+            res.status(404).json({
+              mensaje: "No se encontraron registros para hoy con ese idnodo.",
+            });
           }
         }
       });
     }
   });
 });
-//rutas para infrarrojo (get, post, delete, put)
-router.get("/datosInfrarrojo", (req, res) => {
-  var json1 = {}; //variable para almacenar cada registro que se lea, en  formato json
-  var arreglo = []; //variable para almacenar todos los datos, en formato arreglo de json
+
+router.post("/datosPeso", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
   connection.getConnection(function (error, tempConn) {
     //conexion a mysql
     if (error) {
-      throw error; //si no se pudo conectar
+      throw error; //en caso de error en la conexion
     } else {
       console.log("Conexion correcta.");
-      //ejecución de la consulta
-      tempConn.query("SELECT * FROM datosinfrarrojo", function (error, result) {
-        var resultado = result; //se almacena el resultado de la consulta en la variable resultado
-        if (error) {
-          throw error;
-        } else {
-          tempConn.release(); //se librea la conexión
-          for (i = 0; i < resultado.length; i++) {
-            //se lee el resultado y se arma el json
-            json1 = {
-              id: resultado[i].id,
-              idnodo: resultado[i].idnodo,
-              actividad: resultado[i].actividad,
-              fechahora: resultado[i].fechahora,
-            };
-            console.log(json1); //se muestra el json en la consola
-            arreglo.push(json1); //se añade el json al arreglo
+      tempConn.query(
+        "INSERT INTO datospeso VALUES(null, ?, ?, ?, now())",
+        [json1.usuario_id, json1.idnodo, json1.peso],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release();
           }
-          res.json(arreglo); //se retorna el arreglo
+          //client.end() //si se habilita esta opción el servicio termina
         }
-      });
+      );
     }
   });
+  res.status(200).send(`datos almacenados`); //mensaje de respuesta al cliente
 });
+
+router.delete("/datosPeso", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "DELETE FROM datospeso WHERE idnodo = ?",
+        [json1.idnodo],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos eliminados`); //mensaje de respuesta al cliente
+});
+
+router.put("/datosPeso", (req, res) => {
+  var json1 = req.body; //se recibe el json con los datos
+  console.log(json1); //se muestra en consola
+  connection.getConnection(function (error, tempConn) {
+    //conexion a mysql
+    if (error) {
+      throw error; //en caso de error en la conexion
+    } else {
+      console.log("Conexion correcta.");
+      tempConn.query(
+        "UPDATE datospeso SET peso = ? WHERE idnodo = ?",
+        [json1.peso, json1.idnodo],
+        function (error, result) {
+          //se ejecuta lainserción
+          if (error) {
+            throw error;
+          } else {
+            tempConn.release();
+          }
+          //client.end() //si se habilita esta opción el servicio termina
+        }
+      );
+    }
+  });
+  res.status(200).send(`datos actualizados`); //mensaje de respuesta al cliente
+});
+
+
+//rutas para infrarrojo (get, post, delete, put)
+// router.post("/datosInfrarrojo", (req, res) => {
+//   var json1 = req.body;
+//   var arreglo = []; //variable para almacenar todos los datos, en formato arreglo de json
+//   connection.getConnection(function (error, tempConn) {
+//     //conexion a mysql
+//     if (error) {
+//       throw error; //si no se pudo conectar
+//     } else {
+//       console.log("Conexion correcta.");
+//       //ejecución de la consulta
+//       const query = `SELECT di.id, di.idnodo, di.actividad, di.fechahora
+//       FROM usuarios u
+//       JOIN datosinfrarrojo di ON u.id = di.usuario_id
+//       WHERE u.id = ? AND DATE(fechahora) = CURDATE()`;
+//       tempConn.query(query, [json1.userid], function (error, result) {
+//         var resultado = result; //se almacena el resultado de la consulta en la variable resultado
+//         if (error) {
+//           throw error;
+//         } else {
+//           tempConn.release(); //se librea la conexión
+//           for (i = 0; i < resultado.length; i++) {
+//             //se lee el resultado y se arma el json
+//             json1 = {
+//               id: resultado[i].id,
+//               idnodo: resultado[i].idnodo,
+//               actividad: resultado[i].actividad,
+//               fechahora: resultado[i].fechahora,
+//             };
+//             console.log(json1); //se muestra el json en la consola
+//             arreglo.push(json1); //se añade el json al arreglo
+//           }
+//           res.json(arreglo); //se retorna el arreglo
+//         }
+//       });
+//     }
+//   });
+// });
 
 // Ruta GET para obtener datos de `datosInfrarrojo` filtrados por `idnodo`
 router.get("/datosInfrarrojo/:idnodo", (req, res) => {
@@ -144,11 +347,9 @@ router.get("/datosInfrarrojo/:idnodo", (req, res) => {
           if (result.length > 0) {
             res.json(result); // Devolver los registros filtrados como respuesta JSON
           } else {
-            res
-              .status(404)
-              .json({
-                mensaje: "No se encontraron registros para hoy con ese idnodo.",
-              });
+            res.status(404).json({
+              mensaje: "No se encontraron registros para hoy con ese idnodo.",
+            });
           }
         }
       });
@@ -166,8 +367,8 @@ router.post("/datosInfrarrojo", (req, res) => {
     } else {
       console.log("Conexion correcta.");
       tempConn.query(
-        "INSERT INTO datosinfrarrojo VALUES(null, ?, ?, now())",
-        [json1.idnodo, json1.actividad],
+        "INSERT INTO datosinfrarrojo VALUES(null, ?, ?, ?, now())",
+        [json1.usuario_id, json1.idnodo, json1.actividad],
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
@@ -235,44 +436,6 @@ router.put("/datosInfrarrojo", (req, res) => {
     }
   });
   res.status(200).send(`datos actualizados`); //mensaje de respuesta al cliente
-});
-
-//rutas para ultrasonido (get, post, delete, put)
-router.get("/datosUltrasonido", (req, res) => {
-  var json1 = {}; //variable para almacenar cada registro que se lea, en  formato json
-  var arreglo = []; //variable para almacenar todos los datos, en formato arreglo de json
-  connection.getConnection(function (error, tempConn) {
-    //conexion a mysql
-    if (error) {
-      throw error; //si no se pudo conectar
-    } else {
-      console.log("Conexion correcta.");
-      //ejecución de la consulta
-      tempConn.query(
-        "SELECT * FROM datosUltrasonido where id = 1",
-        function (error, result) {
-          var resultado = result; //se almacena el resultado de la consulta en la variable resultado
-          if (error) {
-            throw error;
-          } else {
-            tempConn.release(); //se librea la conexión
-            for (i = 0; i < resultado.length; i++) {
-              //se lee el resultado y se arma el json
-              json1 = {
-                id: resultado[i].id,
-                idnodo: resultado[i].idnodo,
-                distancia: resultado[i].distancia,
-                fechahora: resultado[i].fechahora,
-              };
-              console.log(json1); //se muestra el json en la consola
-              arreglo.push(json1); //se añade el json al arreglo
-            }
-            res.json(arreglo); //se retorna el arreglo
-          }
-        }
-      );
-    }
-  });
 });
 
 module.exports = router;
