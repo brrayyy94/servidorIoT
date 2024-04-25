@@ -29,6 +29,7 @@ new Chart($grafica, {
         {
           ticks: {
             beginAtZero: true,
+            max: 50,
           },
         },
       ],

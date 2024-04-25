@@ -54,7 +54,7 @@
         window.respJson = <?php echo json_encode($respuesta); ?>;
         // Justo aquí estamos pasando la variable ----^ 
     </script>
-    <canvas id="grafica" width="50" height="10"></canvas>
+    <canvas id="grafica" width="50" height="40"></canvas>
     <script src="script-ultrasonido.js"></script>
     <a href="pagina1.php">Volver</a><br>
     <a href="logout.php">Cerrar sesión</a>

@@ -46,7 +46,7 @@ client.on("connect", function () {
     if (err) {
       console.log("error en la subscripcion");
     } else {
-      console.log("Subscripcion exitosa");
+      console.log("Subscripcion exitosa Peso");
     }
   });
 });
@@ -70,7 +70,6 @@ client.on("message", function (topic, message) {
             //se ejecuta lainserción
             if (error) {
               throw error;
-              console.log("error al ejecutar el query"); //esto no se esta ejecutando
             } else {
               tempConn.release();
               console.log("datos almacenados"); //mensaje de respuesta en consola
@@ -94,7 +93,6 @@ client.on("message", function (topic, message) {
             //se ejecuta lainserción
             if (error) {
               throw error;
-              console.log("error al ejecutar el query"); //esto no se esta ejecutando
             } else {
               tempConn.release();
               console.log("datos almacenados"); //mensaje de respuesta en consola
@@ -118,7 +116,6 @@ client.on("message", function (topic, message) {
             //se ejecuta lainserción
             if (error) {
               throw error;
-              console.log("error al ejecutar el query"); //esto no se esta ejecutando
             } else {
               tempConn.release();
               console.log("datos almacenados"); //mensaje de respuesta en consola
