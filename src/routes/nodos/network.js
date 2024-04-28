@@ -31,7 +31,7 @@ router.get("/datosUltrasonido", (req, res) => {
         function (error, result) {
           var resultado = result; //se almacena el resultado de la consulta en la variable resultado
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release(); //se librea la conexión
             for (i = 0; i < resultado.length; i++) {
@@ -102,7 +102,7 @@ router.post("/datosUltrasonido", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -128,8 +128,9 @@ router.delete("/datosUltrasonido", (req, res) => {
         [json1.idnodo],
         function (error, result) {
           //se ejecuta lainserción
+            res.status(500).send(error.message);
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -156,7 +157,7 @@ router.put("/datosUltrasonido", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -217,7 +218,7 @@ router.post("/datosPeso", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -244,7 +245,7 @@ router.delete("/datosPeso", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -271,7 +272,7 @@ router.put("/datosPeso", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -372,7 +373,7 @@ router.post("/datosInfrarrojo", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -399,7 +400,7 @@ router.delete("/datosInfrarrojo", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
@@ -426,7 +427,7 @@ router.put("/datosInfrarrojo", (req, res) => {
         function (error, result) {
           //se ejecuta lainserción
           if (error) {
-            throw error;
+            res.status(500).send(error.message);
           } else {
             tempConn.release();
           }
