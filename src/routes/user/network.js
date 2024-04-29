@@ -40,7 +40,7 @@ router.post("/login", (req, res) => {
           tempConn.release(); // Liberar la conexión
 
           if (result.length > 0) {
-            res.json(result); // Devolver los registros como respuesta JSON
+            res.json({info:result}); // Devolver los registros como respuesta JSON
           } else {
             res.status(404).json({
               mensaje: "No se encontraron registros con ese email y password.",
