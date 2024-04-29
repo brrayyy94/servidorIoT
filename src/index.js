@@ -74,8 +74,8 @@ client.on("message", function (topic, message) {
       } else {
         console.log("Conexion correcta.");
         tempConn.query(
-          "INSERT INTO datosinfrarrojo VALUES(null, ?, ?, now())",
-          [json1.id, json1.valueInfrarrojo],
+          "INSERT INTO datosinfrarrojo VALUES(null, ?, ?, ?, now())",
+          [json1.usuario_id, json1.idnodo, json1.valueInfrarrojo],
           function (error, result) {
             //se ejecuta lainserción
             if (error) {
@@ -97,8 +97,8 @@ client.on("message", function (topic, message) {
       } else {
         console.log("Conexion correcta.");
         tempConn.query(
-          "INSERT INTO datosultrasonido VALUES(null, ?, ?, now())",
-          [json1.id, json1.valueUltrasonido],
+          "INSERT INTO datosultrasonido VALUES(null, ?, ?, ?, now())",
+          [json1.usuario_id, json1.idnodo, json1.valueUltrasonido],
           function (error, result) {
             //se ejecuta lainserción
             if (error) {
@@ -120,8 +120,8 @@ client.on("message", function (topic, message) {
       } else {
         console.log("Conexion correcta.");
         tempConn.query(
-          "INSERT INTO datosPeso VALUES(null, ?, ?, now())",
-          [json1.id, json1.valuePeso],
+          "INSERT INTO datosPeso VALUES(null, ?, ?, ?, now())",
+          [json1.usuario_id, json1.idnodo, json1.valuePeso],
           function (error, result) {
             //se ejecuta lainserción
             if (error) {
