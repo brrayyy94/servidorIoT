@@ -11,11 +11,18 @@ app.set("port", 3000); //se define el puerto en el cual va a funcionar el servid
 // Utilities
 app.use(morgan("dev")); //se indica que se va a usar morgan en modo dev
 
+app.use(cors()); //se indica que se va a usar cors
+
 app.use(express.json()); //se indica que se va a usar la funcionalidad para manejo de json de express
 
 //Routes
 //Inicializar las rutas del servidor y configurar las rutas en la app de express
 routes(app);
+
+app.get("/", (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.send("Este es el principal");
+});
 
 //var client = mqtt.connect('mqtt://localhost)
 var client = mqtt.connect("mqtt://broker.mqtt-dashboard.com");
