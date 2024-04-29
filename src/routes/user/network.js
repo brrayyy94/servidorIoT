@@ -28,7 +28,7 @@ router.post("/login", (req, res) => {
     } else {
       console.log("Conexión correcta.");
 
-      // Consulta para obtener el usuario con el email y password proporcionados
+      // Consulta para obtener los usuarios con el email y password proporcionados
       const query = `
           SELECT * FROM usuarios
           WHERE user = ? AND password = ?`;
@@ -39,11 +39,16 @@ router.post("/login", (req, res) => {
         } else {
           tempConn.release(); // Liberar la conexión
 
+          const responseData = {}; // Objeto JSON para almacenar los resultados
+
           if (result.length > 0) {
-            res.json({info:result}); // Devolver los registros como respuesta JSON
+            result.forEach((row, index) => {
+              responseData[`user${index + 1}`] = row; // Almacena cada registro en el objeto JSON
+            });
+            res.json(responseData); // Devolver los registros como respuesta JSON
           } else {
             res.status(404).json({
-              mensaje: "No se encontraron registros con ese email y password.",
+              mensaje: "No se encontraron registros con ese user y password.",
             });
           }
         }
@@ -93,7 +98,9 @@ router.get("/:id", (req, res) => {
         SELECT idnodo FROM datosinfrarrojo WHERE usuario_id = ?
       ) AS nodos_unicos`;
     realizarConsulta(queryNodos, [id, id, id], function (resultNodos) {
-      resultado_final.nodos = resultNodos.map(nodo => ({ idnodo: nodo.idnodo }));
+      resultado_final.nodos = resultNodos.map((nodo) => ({
+        idnodo: nodo.idnodo,
+      }));
 
       // Retornar el objeto final como respuesta
       res.json(resultado_final);
