@@ -58,55 +58,52 @@ router.post("/login", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-  var { id } = req.params;
-  console.log(id);
-
-  // Objeto para almacenar los resultados finales
-  var resultado_final = {};
+  const { id } = req.params;
 
   // Función para realizar consultas SQL
-  function realizarConsulta(query, params, callback) {
-    connection.getConnection(function (error, tempConn) {
-      if (error) {
-        throw error;
-      } else {
-        tempConn.query(query, params, function (error, result) {
-          if (error) {
-            throw error;
-          } else {
-            tempConn.release();
-            callback(result);
-          }
-        });
-      }
+  function realizarConsulta(query, params) {
+    return new Promise((resolve, reject) => {
+      connection.query(query, params, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
     });
   }
 
   // Consulta para obtener datos del usuario
   const queryUsuario = `SELECT id, user, password FROM usuarios WHERE id = ?`;
-  realizarConsulta(queryUsuario, [id], function (resultUsuario) {
-    resultado_final.usuario = resultUsuario[0];
+  realizarConsulta(queryUsuario, [id])
+    .then((resultUsuario) => {
+      const usuario = resultUsuario[0];
 
-    // Consulta para obtener nodos asociados al usuario
-    const queryNodos = `
-      SELECT idnodo 
-      FROM (
-        SELECT idnodo FROM datosultrasonido WHERE usuario_id = ?
-        UNION
-        SELECT idnodo FROM datospeso WHERE usuario_id = ?
-        UNION
-        SELECT idnodo FROM datosinfrarrojo WHERE usuario_id = ?
-      ) AS nodos_unicos`;
-    realizarConsulta(queryNodos, [id, id, id], function (resultNodos) {
-      resultado_final.nodos = resultNodos.map((nodo) => ({
-        idnodo: nodo.idnodo,
-      }));
-
-      // Retornar el objeto final como respuesta
-      res.json(resultado_final);
+      // Consulta para obtener nodos asociados al usuario
+      const queryNodos = `
+        SELECT idnodo 
+        FROM (
+          SELECT idnodo FROM datosultrasonido WHERE usuario_id = ?
+          UNION
+          SELECT idnodo FROM datospeso WHERE usuario_id = ?
+          UNION
+          SELECT idnodo FROM datosinfrarrojo WHERE usuario_id = ?
+        ) AS nodos_unicos`;
+      return realizarConsulta(queryNodos, [id, id, id])
+        .then((resultNodos) => {
+          const nodos = resultNodos.map((nodo) => ({ idnodo: nodo.idnodo }));
+          return { usuario, nodos };
+        });
+    })
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((error) => {
+      console.error("Error en la consulta:", error);
+      res.status(500).json({ mensaje: "Error en la consulta SQL." });
     });
-  });
 });
+
 
 router.post("/register", (req, res) => {
   const { user, password } = req.body;
