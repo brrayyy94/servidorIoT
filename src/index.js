@@ -1,6 +1,7 @@
 var mqtt = require("mqtt");
 const mysql = require("mysql");
 const routes = require("./routes/routes.js");
+const cors = require("cors");
 
 const express = require("express"); //se indica que se requiere express
 const app = express(); // se inicia express y se instancia en una constante de  nombre app.
