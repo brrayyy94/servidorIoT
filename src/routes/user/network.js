@@ -138,7 +138,7 @@ router.post('/accion', (req, res) => {
   const jsonData = req.body; // El JSON recibido estará disponible en req.body
   console.log('JSON recibido:', jsonData);
   
-  // Aquí se realizar cualquier operación con el JSON recibido, como almacenarlo en una base de datos, procesarlo, etc.
+  // Aquí se puede realizar cualquier operación con el JSON recibido, como almacenarlo en una base de datos, procesarlo, etc.
 
   // Envía una respuesta de éxito al cliente
   res.status(200).send(jsonData);

@@ -60,14 +60,13 @@ client.on("connect", function () {
       console.log("Subscripcion exitosa Peso");
     }
   });
-});
-
-client.subscribe("accionTapa", function (err) {
-  if (err) {
-    console.log("error en la subscripcion");
-  } else {
-    console.log("Subscripcion exitosa");
-  }
+  client.subscribe("accionTapa", function (err) {
+    if (err) {
+      console.log("error en la subscripcion");
+    } else {
+      console.log("Subscripcion exitosa");
+    }
+  });
 });
 
 client.on("message", function (topic, message) {
