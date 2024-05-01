@@ -2,6 +2,7 @@ var mqtt = require("mqtt");
 const mysql = require("mysql");
 const routes = require("./routes/routes.js");
 const cors = require("cors");
+const axios = require('axios');
 
 const express = require("express"); //se indica que se requiere express
 const app = express(); // se inicia express y se instancia en una constante de  nombre app.
@@ -59,6 +60,30 @@ client.on("connect", function () {
       console.log("Subscripcion exitosa Peso");
     }
   });
+});
+
+client.subscribe("accionTapa", function (err) {
+  if (err) {
+    console.log("error en la subscripcion");
+  } else {
+    console.log("Subscripcion exitosa");
+  }
+});
+
+client.on("message", function (topic, message) {
+  if (topic == "accionTapa") {
+    const json1 = JSON.parse(message.toString());
+    console.log(json1);
+
+    // Enviar json1 a un endpoint usando axios
+    axios.post('http://localhost:3000/user/accion', json1)
+      .then(function (response) {
+        console.log('Respuesta del servidor:', response.data);
+      })
+      .catch(function (error) {
+        console.error('Error al enviar el JSON al servidor:', error);
+      });
+  }
 });
 
 client.on("message", function (topic, message) {

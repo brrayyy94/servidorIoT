@@ -1,4 +1,4 @@
-const { Router } = require("express");
+const { Router, json } = require("express");
 
 const router = Router();
 
@@ -131,6 +131,17 @@ router.post("/register", (req, res) => {
       });
     }
   });
+});
+
+// Ruta para manejar la solicitud POST que recibe el JSON
+router.post('/accion', (req, res) => {
+  const jsonData = req.body; // El JSON recibido estará disponible en req.body
+  console.log('JSON recibido:', jsonData);
+  
+  // Aquí se realizar cualquier operación con el JSON recibido, como almacenarlo en una base de datos, procesarlo, etc.
+
+  // Envía una respuesta de éxito al cliente
+  res.status(200).send(jsonData);
 });
 
 module.exports = router; // Exporta el router con las rutas configuradas
