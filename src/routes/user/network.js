@@ -104,9 +104,8 @@ router.get("/:id", (req, res) => {
     });
 });
 
-
 router.post("/register", (req, res) => {
-  const { user, password } = req.body;
+  const { user, password, userType } = req.body;
 
   connection.getConnection((error, tempConn) => {
     if (error) {
@@ -114,19 +113,40 @@ router.post("/register", (req, res) => {
     } else {
       console.log("Conexión correcta.");
 
-      const query = `
-          INSERT INTO usuarios (user, password)
-          VALUES (?, ?)`;
+      // Consulta para verificar si el usuario ya existe
+      const checkUserQuery = `SELECT COUNT(*) AS count FROM usuarios WHERE user = ?`;
 
-      tempConn.query(query, [user, password], (error, result) => {
+      tempConn.query(checkUserQuery, [user], (error, result) => {
         if (error) {
-          res.status(500).send("Error en la ejecución del query.");
-        } else {
           tempConn.release();
+          res.status(500).send("Error en la ejecución de la consulta de verificación de usuario.");
+        } else {
+          const userCount = result[0].count;
 
-          res.json({
-            mensaje: "Usuario registrado correctamente.",
-          });
+          if (userCount > 0) {
+            // Si el usuario ya existe, devuelve un mensaje de error
+            tempConn.release();
+            res.status(400).json({
+              mensaje: "El nombre de usuario ya está en uso. Por favor, elija otro.",
+            });
+          } else {
+            // Si el usuario no existe, procede con la inserción
+            const insertQuery = `
+              INSERT INTO usuarios (user, password, userType)
+              VALUES (?, ?, ?)`;
+
+            tempConn.query(insertQuery, [user, password, userType], (error, result) => {
+              if (error) {
+                tempConn.release();
+                res.status(500).send("Error en la ejecución del query.");
+              } else {
+                tempConn.release();
+                res.json({
+                  mensaje: "Usuario registrado correctamente.",
+                });
+              }
+            });
+          }
         }
       });
     }
