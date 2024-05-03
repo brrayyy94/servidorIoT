@@ -89,11 +89,10 @@ router.get("/:id", (req, res) => {
           UNION
           SELECT idnodo FROM datosinfrarrojo WHERE usuario_id = ?
         ) AS nodos_unicos`;
-      return realizarConsulta(queryNodos, [id, id, id])
-        .then((resultNodos) => {
-          const nodos = resultNodos.map((nodo) => ({ idnodo: nodo.idnodo }));
-          return { usuario, nodos };
-        });
+      return realizarConsulta(queryNodos, [id, id, id]).then((resultNodos) => {
+        const nodos = resultNodos.map((nodo) => ({ idnodo: nodo.idnodo }));
+        return { usuario, nodos };
+      });
     })
     .then((data) => {
       res.json(data);
@@ -119,7 +118,11 @@ router.post("/register", (req, res) => {
       tempConn.query(checkUserQuery, [user], (error, result) => {
         if (error) {
           tempConn.release();
-          res.status(500).send("Error en la ejecución de la consulta de verificación de usuario.");
+          res
+            .status(500)
+            .send(
+              "Error en la ejecución de la consulta de verificación de usuario."
+            );
         } else {
           const userCount = result[0].count;
 
@@ -127,7 +130,8 @@ router.post("/register", (req, res) => {
             // Si el usuario ya existe, devuelve un mensaje de error
             tempConn.release();
             res.status(400).json({
-              mensaje: "El nombre de usuario ya está en uso. Por favor, elija otro.",
+              mensaje:
+                "El nombre de usuario ya está en uso. Por favor, elija otro.",
             });
           } else {
             // Si el usuario no existe, procede con la inserción
@@ -135,17 +139,21 @@ router.post("/register", (req, res) => {
               INSERT INTO usuarios (user, password, userType)
               VALUES (?, ?, ?)`;
 
-            tempConn.query(insertQuery, [user, password, userType], (error, result) => {
-              if (error) {
-                tempConn.release();
-                res.status(500).send("Error en la ejecución del query.");
-              } else {
-                tempConn.release();
-                res.json({
-                  mensaje: "Usuario registrado correctamente.",
-                });
+            tempConn.query(
+              insertQuery,
+              [user, password, userType],
+              (error, result) => {
+                if (error) {
+                  tempConn.release();
+                  res.status(500).send("Error en la ejecución del query.");
+                } else {
+                  tempConn.release();
+                  res.json({
+                    mensaje: "Usuario registrado correctamente.",
+                  });
+                }
               }
-            });
+            );
           }
         }
       });
@@ -154,14 +162,37 @@ router.post("/register", (req, res) => {
 });
 
 // Ruta para manejar la solicitud POST que recibe el JSON
-router.post('/accion', (req, res) => {
-  const jsonData = req.body; // El JSON recibido estará disponible en req.body
-  console.log('JSON recibido:', jsonData);
-  
-  // Aquí se puede realizar cualquier operación con el JSON recibido, como almacenarlo en una base de datos, procesarlo, etc.
+router.get("/accion", (req, res) => {
 
-  // Envía una respuesta de éxito al cliente
-  res.status(200).send(jsonData);
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      console.error(error.message);
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `
+          SELECT * FROM accionesTapa
+          WHERE DATE(fechahora) = CURDATE()`;
+
+      tempConn.query(query, [idnodo], (error, result) => {
+        if (error) {
+          console.error(error.message);
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+
+          if (result.length > 0) {
+            res.json(result);
+          } else {
+            res.status(404).json({
+              mensaje: "No se encontraron registros para hoy con ese idnodo.",
+            });
+          }
+        }
+      });
+    }
+  });
 });
 
 module.exports = router; // Exporta el router con las rutas configuradas

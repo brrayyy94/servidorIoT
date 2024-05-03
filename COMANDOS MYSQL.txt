@@ -11,6 +11,12 @@ password VARCHAR(255) NOT NULL,
 userType ENUM('admin', 'cliente', 'tienda') NOT NULL
 );
 
+CREATE TABLE accionesTapa (
+id INT AUTO_INCREMENT PRIMARY KEY,
+estadoTapa VARCHAR(255) NOT NULL,
+fechahora DATETIME
+);
+
 Para agregar el nuevo campo de userType:
 
 -- Paso 1: Desactivar restricciones de clave externa temporalmente
