@@ -138,9 +138,8 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.post("/dispensar/:id", (req, res) => {
+router.post("/dispensar", (req, res) => {
   const json1 = req.body;
-  const {id} = req.params;
 
   connection.getConnection((error, tempConn) => {
     if (error) {
@@ -150,7 +149,7 @@ router.post("/dispensar/:id", (req, res) => {
 
       const query = `INSERT INTO accionesDispensador VALUES(null, ?, ?, now())`;
 
-      tempConn.query(query, [id, json1.accionDispensador], (error, result) => {
+      tempConn.query(query, [json1.idnodo, json1.accionDispensador], (error, result) => {
         if (error) {
           tempConn.release();
           res.status(500).send("Error en la ejecución del query.");
