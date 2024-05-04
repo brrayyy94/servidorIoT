@@ -16,7 +16,39 @@ const connection = mysql.createPool({
 
 // Ruta para el método GET en /user/login
 router.get("/", (req, res) => {
-  success(res, "Todo correcto en /login", 200); // Responde con un mensaje de éxito
+  res.status(200).send("Todo correcto en /user"); // Responde con un mensaje de éxito
+});
+
+router.get("/accion", (req, res) => {
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      console.error(error.message);
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `
+          SELECT * FROM accionesTapa
+          WHERE DATE(fechahora) = CURDATE()`;
+
+      tempConn.query(query, (error, result) => {
+        if (error) {
+          console.error(error.message);
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+
+          if (result.length > 0) {
+            res.json(result);
+          } else {
+            res.status(404).json({
+              mensaje: "No se encontraron registros para hoy",
+            });
+          }
+        }
+      });
+    }
+  });
 });
 
 router.post("/login", (req, res) => {
@@ -154,40 +186,6 @@ router.post("/register", (req, res) => {
                 }
               }
             );
-          }
-        }
-      });
-    }
-  });
-});
-
-// Ruta para manejar la solicitud POST que recibe el JSON
-router.get("/accion", (req, res) => {
-
-  connection.getConnection((error, tempConn) => {
-    if (error) {
-      console.error(error.message);
-      res.status(500).send("Error al conectar a la base de datos.");
-    } else {
-      console.log("Conexión correcta.");
-
-      const query = `
-          SELECT * FROM accionesTapa
-          WHERE DATE(fechahora) = CURDATE()`;
-
-      tempConn.query(query, [idnodo], (error, result) => {
-        if (error) {
-          console.error(error.message);
-          res.status(500).send("Error en la ejecución del query.");
-        } else {
-          tempConn.release();
-
-          if (result.length > 0) {
-            res.json(result);
-          } else {
-            res.status(404).json({
-              mensaje: "No se encontraron registros para hoy con ese idnodo.",
-            });
           }
         }
       });

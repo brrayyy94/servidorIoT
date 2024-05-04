@@ -77,7 +77,7 @@ client.on("message", function (topic, message) {
     connection.getConnection(function (error, tempConn) {
       if (error) {
         console.error(error.message);
-        res.status(500).send("Error al conectar a la base de datos.");
+        console.log("Error al conectar a la base de datos.");
       } else {
         console.log("Conexión correcta.");
 
@@ -87,10 +87,9 @@ client.on("message", function (topic, message) {
           function (error, result) {
             if (error) {
               console.error(error.message);
-              res.status(500).send("Error al insertar los datos.");
             } else {
               tempConn.release();
-              res.status(200).send("Datos almacenados correctamente.");
+              console.log("datos almacenados"); //mensaje de respuesta en consola
             }
           }
         );
