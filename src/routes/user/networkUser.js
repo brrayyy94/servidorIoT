@@ -138,8 +138,9 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.post("/dispensar", (req, res) => {
-  const {accionDispensador} = req.body;
+router.post("/dispensar/:id", (req, res) => {
+  const json1 = req.body;
+  const {id} = req.params;
 
   connection.getConnection((error, tempConn) => {
     if (error) {
@@ -147,16 +148,16 @@ router.post("/dispensar", (req, res) => {
     } else {
       console.log("Conexión correcta.");
 
-      const query = `INSERT INTO accionesDispensador VALUES(null, ?, now())`;
+      const query = `INSERT INTO accionesDispensador VALUES(null, ?, ?, now())`;
 
-      tempConn.query(query, [accionDispensador], (error, result) => {
+      tempConn.query(query, [id, json1.accionDispensador], (error, result) => {
         if (error) {
           tempConn.release();
           res.status(500).send("Error en la ejecución del query.");
         } else {
           tempConn.release();
-          res.status(200).json({ message: accionDispensador });
-          client.publish("accionDispensador", JSON.stringify({ accionDispensador }));
+          res.status(200).json(json1);
+          client.publish("accionDispensador", JSON.stringify(json1));
         }
       });
     }
