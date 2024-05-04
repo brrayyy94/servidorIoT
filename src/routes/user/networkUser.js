@@ -1,8 +1,11 @@
 const { Router, json } = require("express");
+const mqtt = require("mqtt");
 
 const router = Router();
-
 const mysql = require("mysql");
+
+
+var client = mqtt.connect("mqtt://broker.mqtt-dashboard.com");
 
 // se crea la conexión a mysql
 const connection = mysql.createPool({
@@ -134,6 +137,32 @@ router.get("/:id", (req, res) => {
       res.status(500).json({ mensaje: "Error en la consulta SQL." });
     });
 });
+
+router.post("/dispensar", (req, res) => {
+  const {accionDispensador} = req.body;
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `INSERT INTO accionesDispensador VALUES(null, ?, now())`;
+
+      tempConn.query(query, [accionDispensador], (error, result) => {
+        if (error) {
+          tempConn.release();
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+          res.status(200).json({ message: accionDispensador });
+          client.publish("accionDispensador", JSON.stringify({ accionDispensador }));
+        }
+      });
+    }
+  });
+});
+
 
 router.post("/register", (req, res) => {
   const { user, password, userType } = req.body;

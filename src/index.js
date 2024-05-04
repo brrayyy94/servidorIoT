@@ -2,7 +2,6 @@ var mqtt = require("mqtt");
 const mysql = require("mysql");
 const routes = require("./routes/routes.js");
 const cors = require("cors");
-const axios = require("axios");
 
 const express = require("express"); //se indica que se requiere express
 const app = express(); // se inicia express y se instancia en una constante de  nombre app.
@@ -189,3 +188,6 @@ client.on("message", function (topic, message) {
 app.listen(app.get("port"), () => {
   console.log(`Servidor funcionando port http://localhost:${app.get("port")}`);
 });
+
+
+module.exports = client;
