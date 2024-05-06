@@ -24,6 +24,13 @@ accionDispensador INT NOT NULL,
 fechahora DATETIME
 );
 
+CREATE TABLE notificacionTienda (
+id INT AUTO_INCREMENT PRIMARY KEY,
+mensaje VARCHAR(255),
+usuario_id INT NOT NULL,
+fechahora DATETIME,
+FOREIGN KEY (usuario_id) REFERENCES usuarios(id));
+
 Para agregar el nuevo campo de userType:
 
 -- Paso 1: Desactivar restricciones de clave externa temporalmente
@@ -34,20 +41,6 @@ ALTER TABLE usuarios ADD COLUMN userType ENUM('admin', 'cliente', 'tienda') NOT 
 
 -- Paso 3: Reactivar restricciones de clave externa
 SET foreign_key_checks = 1;
-
-
-CREATE TABLE datosnodo (
-id int AUTO_INCREMENT,
-idnodo INT,
-temperatura DOUBLE,
-humedad DOUBLE,
-fechahora DATETIME,
-PRIMARY KEY (id));
-
-SHOW TABLES;
-
-SELECT * FROM datosnodo;
-DELETE FROM datosnodo WHERE idnodo=2;
 
 CREATE TABLE datosUltrasonido (
 id int AUTO_INCREMENT PRIMARY KEY,
