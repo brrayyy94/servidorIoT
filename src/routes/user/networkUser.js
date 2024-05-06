@@ -89,10 +89,11 @@ router.get("/:id", (req, res) => {
           UNION
           SELECT idnodo FROM datosinfrarrojo WHERE usuario_id = ?
         ) AS nodos_unicos`;
-      return realizarConsulta(queryNodos, [id, id, id]).then((resultNodos) => {
-        const nodos = resultNodos.map((nodo) => ({ idnodo: nodo.idnodo }));
-        return { usuario, nodos };
-      });
+      return realizarConsulta(queryNodos, [id, id, id])
+        .then((resultNodos) => {
+          const nodos = resultNodos.map((nodo) => ({ idnodo: nodo.idnodo }));
+          return { usuario, nodos };
+        });
     })
     .then((data) => {
       res.json(data);
@@ -102,6 +103,7 @@ router.get("/:id", (req, res) => {
       res.status(500).json({ mensaje: "Error en la consulta SQL." });
     });
 });
+
 
 router.post("/register", (req, res) => {
   const { user, password } = req.body;
@@ -132,64 +134,14 @@ router.post("/register", (req, res) => {
 });
 
 // Ruta para manejar la solicitud POST que recibe el JSON
-router.post("/accion", (req, res) => {
+router.post('/accion', (req, res) => {
   const jsonData = req.body; // El JSON recibido estará disponible en req.body
-  console.log("JSON recibido:", jsonData);
-
+  console.log('JSON recibido:', jsonData);
+  
   // Aquí se puede realizar cualquier operación con el JSON recibido, como almacenarlo en una base de datos, procesarlo, etc.
 
   // Envía una respuesta de éxito al cliente
   res.status(200).send(jsonData);
-});
-
-router.post("/tienda", (req, res) => {
-  const json1 = req.body;
-
-  connection.getConnection((error, tempConn) => {
-    if (error) {
-      res.status(500).send("Error al conectar a la base de datos.");
-    } else {
-      console.log("Conexión correcta.");
-
-      const query = `
-          INSERT INTO notificacionTienda VALUES (null, ?, ?, now())`;
-
-      tempConn.query(
-        query,
-        [json1.mensaje, json1.usuario_id],
-        (error, result) => {
-          if (error) {
-            res.status(500).send("Error en la ejecución del query.");
-          } else {
-            tempConn.release();
-            res.json(json1);
-          }
-        }
-      );
-    }
-  });
-});
-
-router.get('/tienda', (req, res) => {
-  connection.getConnection((error, tempConn) => {
-    if (error) {
-      res.status(500).send("Error al conectar a la base de datos.");
-    } else {
-      console.log("Conexión correcta.");
-
-      const query = `
-          SELECT * FROM notificacionTienda WHERE DATE(fechahora) = CURDATE()`;
-
-      tempConn.query(query, (error, result) => {
-        if (error) {
-          res.status(500).send("Error en la ejecución del query.");
-        } else {
-          tempConn.release();
-          res.json(result);
-        }
-      });
-    }
-  });
 });
 
 module.exports = router; // Exporta el router con las rutas configuradas

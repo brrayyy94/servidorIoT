@@ -7,8 +7,34 @@ USE calidatos
 CREATE TABLE usuarios (
 id INT AUTO_INCREMENT PRIMARY KEY,
 user VARCHAR(255) NOT NULL,
-password VARCHAR(255) NOT NULL
+password VARCHAR(255) NOT NULL,
+userType ENUM('admin', 'cliente', 'tienda') NOT NULL
 );
+
+CREATE TABLE accionesTapa (
+id INT AUTO_INCREMENT PRIMARY KEY,
+estadoTapa VARCHAR(255) NOT NULL,
+fechahora DATETIME
+);
+
+CREATE TABLE accionesDispensador (
+id INT AUTO_INCREMENT PRIMARY KEY,
+idnodo INT NOT NULL,
+accionDispensador INT NOT NULL,
+fechahora DATETIME
+);
+
+Para agregar el nuevo campo de userType:
+
+-- Paso 1: Desactivar restricciones de clave externa temporalmente
+SET foreign_key_checks = 0;
+
+-- Paso 2: Agregar el campo a la tabla usuarios
+ALTER TABLE usuarios ADD COLUMN userType ENUM('admin', 'cliente', 'tienda') NOT NULL;
+
+-- Paso 3: Reactivar restricciones de clave externa
+SET foreign_key_checks = 1;
+
 
 CREATE TABLE datosnodo (
 id int AUTO_INCREMENT,
