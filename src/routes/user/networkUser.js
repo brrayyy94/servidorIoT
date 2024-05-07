@@ -1,8 +1,11 @@
 const { Router, json } = require("express");
+const mqtt = require("mqtt");
 
 const router = Router();
 
 const mysql = require("mysql");
+
+var client = mqtt.connect("mqtt://broker.mqtt-dashboard.com");
 
 // se crea la conexión a mysql
 const connection = mysql.createPool({
@@ -16,7 +19,7 @@ const connection = mysql.createPool({
 
 // Ruta para el método GET en /user/login
 router.get("/", (req, res) => {
-  success(res, "Todo correcto en /login", 200); // Responde con un mensaje de éxito
+  res.status(200).send("Todo correcto en /user");
 });
 
 router.post("/login", (req, res) => {
@@ -90,16 +93,61 @@ router.post("/register", (req, res) => {
   });
 });
 
+router.post("/dispensar", (req, res) => {
+  const json1 = req.body;
 
-// Ruta para manejar la solicitud POST que recibe el JSON
-router.post('/accion', (req, res) => {
-  const jsonData = req.body; // El JSON recibido estará disponible en req.body
-  console.log('JSON recibido:', jsonData);
-  
-  // Aquí se puede realizar cualquier operación con el JSON recibido, como almacenarlo en una base de datos, procesarlo, etc.
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
 
-  // Envía una respuesta de éxito al cliente
-  res.status(200).send(jsonData);
+      const query = `INSERT INTO accionesDispensador VALUES(null, ?, ?, now())`;
+
+      tempConn.query(query, [json1.idnodo, json1.accionDispensador], (error, result) => {
+        if (error) {
+          tempConn.release();
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+          res.status(200).json(json1);
+          client.publish("accionDispensador", JSON.stringify(json1));
+        }
+      });
+    }
+  });
+});
+
+router.get("/accion", (req, res) => {
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      console.error(error.message);
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `
+          SELECT * FROM accionesTapa
+          WHERE DATE(fechahora) = CURDATE()`;
+
+      tempConn.query(query, (error, result) => {
+        if (error) {
+          console.error(error.message);
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+
+          if (result.length > 0) {
+            res.json(result);
+          } else {
+            res.status(404).json({
+              mensaje: "No se encontraron registros para hoy",
+            });
+          }
+        }
+      });
+    }
+  });
 });
 
 router.post("/tienda", (req, res) => {
@@ -222,4 +270,5 @@ router.get("/:id", (req, res) => {
       res.status(500).json({ mensaje: "Error en la consulta SQL." });
     });
 });
+
 module.exports = router; // Exporta el router con las rutas configuradas
