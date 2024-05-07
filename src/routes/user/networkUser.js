@@ -58,7 +58,12 @@ router.post("/login", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-  const { user, password } = req.body;
+  const { user, password, userType } = req.body;
+
+  // Verificar si los campos están vacíos
+  if (!user || !password) {
+    return res.status(400).json({ mensaje: "Los campos usuario y contraseña son obligatorios." });
+  }
 
   connection.getConnection((error, tempConn) => {
     if (error) {
@@ -67,10 +72,10 @@ router.post("/register", (req, res) => {
       console.log("Conexión correcta.");
 
       const query = `
-          INSERT INTO usuarios (user, password)
-          VALUES (?, ?)`;
+          INSERT INTO usuarios (user, password, userType)
+          VALUES (?, ?, ?)`;
 
-      tempConn.query(query, [user, password], (error, result) => {
+      tempConn.query(query, [user, password, userType], (error, result) => {
         if (error) {
           res.status(500).send("Error en la ejecución del query.");
         } else {
@@ -84,6 +89,7 @@ router.post("/register", (req, res) => {
     }
   });
 });
+
 
 // Ruta para manejar la solicitud POST que recibe el JSON
 router.post('/accion', (req, res) => {
@@ -140,6 +146,30 @@ router.get('/tienda', (req, res) => {
         } else {
           tempConn.release();
           res.json(result);
+        }
+      });
+    }
+  });
+});
+
+router.delete('/tienda/:id', (req, res) => {
+  const { id } = req.params;
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `
+          DELETE FROM notificacionTienda WHERE id = ?`;
+
+      tempConn.query(query, [id], (error, result) => {
+        if (error) {
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+          res.json({ mensaje: "Notificación eliminada correctamente." });
         }
       });
     }
