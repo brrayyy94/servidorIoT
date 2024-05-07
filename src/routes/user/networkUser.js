@@ -112,11 +112,11 @@ router.post("/tienda", (req, res) => {
       console.log("Conexión correcta.");
 
       const query = `
-          INSERT INTO notificacionTienda VALUES (null, ?, ?, now())`;
+          INSERT INTO notificacionTienda VALUES (null, ?, ?, ?, now())`;
 
       tempConn.query(
         query,
-        [json1.mensaje, json1.usuario_id],
+        [json1.mensaje, json1.usuario_id, json1.direccion],
         (error, result) => {
           if (error) {
             res.status(500).send("Error en la ejecución del query.");
