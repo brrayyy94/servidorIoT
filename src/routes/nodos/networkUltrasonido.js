@@ -37,6 +37,7 @@ router.get("/datosUltrasonido", (req, res) => {
               //se lee el resultado y se arma el json
               json1 = {
                 id: resultado[i].id,
+                usuario_id: resultado[i].usuario_id,
                 idnodo: resultado[i].idnodo,
                 distancia: resultado[i].distancia,
                 fechahora: resultado[i].fechahora,

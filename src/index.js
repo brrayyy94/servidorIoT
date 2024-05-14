@@ -81,8 +81,8 @@ client.on("message", function (topic, message) {
         console.log("Conexión correcta.");
 
         tempConn.query(
-          "INSERT INTO accionesTapa VALUES(null, ?, now())",
-          [json1.estadoTapa],
+          "INSERT INTO accionesTapa VALUES(null, ?, ?, ?, now())",
+          [json1.idnodo, json1.usuario_id, json1.estadoTapa],
           function (error, result) {
             if (error) {
               console.error(error.message);
@@ -188,6 +188,3 @@ client.on("message", function (topic, message) {
 app.listen(app.get("port"), () => {
   console.log(`Servidor funcionando port http://localhost:${app.get("port")}`);
 });
-
-
-module.exports = client;

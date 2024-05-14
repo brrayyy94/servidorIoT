@@ -118,7 +118,8 @@ router.post("/dispensar", (req, res) => {
   });
 });
 
-router.get("/accion", (req, res) => {
+router.get("/accion/:usuario_id", (req, res) => {
+  const { usuario_id } = req.params;
   connection.getConnection((error, tempConn) => {
     if (error) {
       console.error(error.message);
@@ -128,9 +129,9 @@ router.get("/accion", (req, res) => {
 
       const query = `
           SELECT * FROM accionesTapa
-          WHERE DATE(fechahora) = CURDATE()`;
+          WHERE DATE(fechahora) = CURDATE() AND usuario_id = ?`;
 
-      tempConn.query(query, (error, result) => {
+      tempConn.query(query, [usuario_id], (error, result) => {
         if (error) {
           console.error(error.message);
           res.status(500).send("Error en la ejecución del query.");
