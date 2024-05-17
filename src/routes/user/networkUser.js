@@ -151,6 +151,125 @@ router.get("/accion/:usuario_id", (req, res) => {
   });
 });
 
+router.get("/allNodos/:id", (req, res) => {
+  const { id } = req.params;
+
+  // Consulta SQL para obtener los datos del usuario
+  const queryUsuario = "SELECT * FROM usuarios WHERE id = ? and userType = 'tienda'";
+
+  // Consulta SQL para obtener todos los nodos existentes sin repetir
+  const queryNodos = `
+  SELECT DISTINCT idnodo, usuario_id
+  FROM (
+      SELECT idnodo,usuario_id FROM datosinfrarrojo
+      UNION
+      SELECT idnodo, usuario_id FROM datospeso
+      UNION
+      SELECT idnodo, usuario_id FROM datosultrasonido
+  ) AS nodos;
+  `;
+
+  // Ejecutar ambas consultas en paralelo
+  connection.query(queryUsuario, [id], (errorUsuario, resultUsuario) => {
+      if (errorUsuario) {
+          console.error("Error al obtener los datos del usuario:", errorUsuario);
+          return res.status(500).json({ error: "Error al obtener los datos del usuario" });
+      }
+      connection.query(queryNodos, [id, id], (errorNodos, resultsNodos) => {
+          if (errorNodos) {
+              console.error("Error al obtener los nodos:", errorNodos);
+              return res.status(500).json({ error: "Error al obtener los nodos" });
+          }
+          // Crear el JSON combinado
+          const datos = {
+              usuario: resultUsuario[0], // Solo se espera un usuario, por lo que tomamos el primer resultado
+              nodos: resultsNodos, // Array de nodos
+          };
+          // Enviar el JSON combinado como respuesta
+          if (resultUsuario.length === 0) {
+              return res.status(401).json({ error: "Usuario no valido" });
+          }
+          res.json(datos);
+      });
+  });
+});
+
+router.post("/pedido", (req, res) => {
+  const json1 = req.body;
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `
+          INSERT INTO pedidos VALUES (null, ?, ?, ?, now())`;
+
+      tempConn.query(
+        query,
+        [json1.mensaje, json1.tienda, json1.usuario_id],
+        (error, result) => {
+          if (error) {
+            res.status(500).send("Error en la ejecución del query.");
+          } else {
+            tempConn.release();
+            res.json(json1);
+          }
+        }
+      );
+    }
+  });
+});
+
+router.get("/pedido/:id", (req, res) => {
+  const { id } = req.params;
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `SELECT id, mensaje, tienda, fechahora FROM pedidos WHERE usuario_id = ?`;
+
+      tempConn.query(query, [id], (error, result) => {
+        if (error) {
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+          res.json(result);
+        }
+      });
+    }
+  });
+});
+
+router.delete('/pedido/:id', (req, res) => {
+  const { id } = req.params;
+
+  connection.getConnection((error, tempConn) => {
+    if (error) {
+      res.status(500).send("Error al conectar a la base de datos.");
+    } else {
+      console.log("Conexión correcta.");
+
+      const query = `
+          DELETE FROM pedidos WHERE id = ?`;
+
+      tempConn.query(query, [id], (error, result) => {
+        if (error) {
+          res.status(500).send("Error en la ejecución del query.");
+        } else {
+          tempConn.release();
+          res.json({ mensaje: "pedido eliminado correctamente." });
+        }
+      });
+    }
+  });
+});
+
+
 router.post("/tienda", (req, res) => {
   const json1 = req.body;
 
