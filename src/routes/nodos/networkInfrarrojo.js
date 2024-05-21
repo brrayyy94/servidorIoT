@@ -114,8 +114,8 @@ routerInfrarrojo.delete("/datosInfrarrojo", (req, res) => {
       console.log("Conexión correcta.");
 
       tempConn.query(
-        "DELETE FROM datosinfrarrojo WHERE idnodo = ?",
-        [json1.idnodo],
+        "DELETE FROM datosinfrarrojo WHERE idnodo = ? and usuario_id = ?",
+        [json1.idnodo, json1.usuario_id],
         function (error, result) {
           // Se ejecuta la eliminación
           if (error) {

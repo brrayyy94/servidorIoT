@@ -114,8 +114,8 @@ routerPeso.delete("/datosPeso", (req, res) => {
       console.log("Conexión correcta.");
 
       tempConn.query(
-        "DELETE FROM datospeso WHERE idnodo = ?",
-        [json1.idnodo],
+        "DELETE FROM datospeso WHERE idnodo = ? and usuario_id = ?",
+        [json1.idnodo, json1.usuario_id],
         function (error, result) {
           // Se ejecuta la eliminación
           if (error) {

@@ -149,8 +149,8 @@ router.delete("/datosUltrasonido", (req, res) => {
       console.log("Conexión correcta.");
 
       tempConn.query(
-        "DELETE FROM datosultrasonido WHERE idnodo = ?",
-        [json1.idnodo],
+        "DELETE FROM datosUltrasonido WHERE idnodo = ? and usuario_id = ?",
+        [json1.idnodo, json1.usuario_id],
         function (error, result) {
           // Se ejecuta la eliminación
           if (error) {
